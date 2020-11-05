@@ -2,13 +2,16 @@ package com.hui.tally;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -19,10 +22,12 @@ import com.hui.tally.adapter.AccountAdapter;
 import com.hui.tally.db.AccountBean;
 import com.hui.tally.db.DBManager;
 import com.hui.tally.utils.BudgetDialog;
+import com.hui.tally.utils.MoreDialog;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     ListView todayLv;  //展示今日收支情况的ListView
@@ -61,6 +66,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editBtn.setOnClickListener(this);
         moreBtn.setOnClickListener(this);
         searchIv.setOnClickListener(this);
+        setLVLongClickListener();
+    }
+    /** 设置ListView的长按事件*/
+    private void setLVLongClickListener() {
+        todayLv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {  //点击了头布局
+                    return false;
+                }
+                int pos = position-1;
+                AccountBean clickBean = mDatas.get(pos);  //获取正在被点击的这条信息
+
+                //弹出提示用户是否删除的对话框
+                showDeleteItemDialog(clickBean);
+                return false;
+            }
+        });
+    }
+    /* 弹出是否删除某一条记录的对话框*/
+    private void showDeleteItemDialog(final  AccountBean clickBean) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("提示信息").setMessage("您确定要删除这条记录么？")
+                .setNegativeButton("取消",null)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int click_id = clickBean.getId();
+                        //执行删除的操作
+                        DBManager.deleteItemFromAccounttbById(click_id);
+                        mDatas.remove(clickBean);   //实时刷新，移除集合当中的对象
+                        adapter.notifyDataSetChanged();   //提示适配器更新数据
+                        setTopTvShow();   //改变头布局TextView显示的内容
+                    }
+                });
+        builder.create().show();   //显示对话框
     }
 
     /** 给ListView添加头布局的方法*/
@@ -131,14 +172,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.main_iv_search:
-
+                Intent it = new Intent(this, SearchActivity.class);  //跳转界面
+                startActivity(it);
                 break;
             case R.id.main_btn_edit:
                 Intent it1 = new Intent(this, RecordActivity.class);  //跳转界面
                 startActivity(it1);
                 break;
             case R.id.main_btn_more:
-
+                MoreDialog moreDialog = new MoreDialog(this);
+                moreDialog.show();
+                moreDialog.setDialogSize();
                 break;
             case R.id.item_mainlv_top_tv_budget:
                 showBudgetDialog();
