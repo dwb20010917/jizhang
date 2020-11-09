@@ -10,20 +10,19 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
-
 import com.hui.tally.AboutActivity;
+import com.hui.tally.HistoryActivity;
+import com.hui.tally.MonthChartActivity;
 import com.hui.tally.R;
+import com.hui.tally.SettingActivity;
 
 public class MoreDialog extends Dialog implements View.OnClickListener {
     Button aboutBtn,settingBtn,historyBtn,infoBtn;
     ImageView errorIv;
-
     public MoreDialog(@NonNull Context context) {
         super(context);
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,13 +49,16 @@ public class MoreDialog extends Dialog implements View.OnClickListener {
                 getContext().startActivity(intent);
                 break;
             case R.id.dialog_more_btn_setting:
-
+                intent.setClass(getContext(), SettingActivity.class);
+                getContext().startActivity(intent);
                 break;
             case R.id.dialog_more_btn_record:
-
+                intent.setClass(getContext(), HistoryActivity.class);
+                getContext().startActivity(intent);
                 break;
             case R.id.dialog_more_btn_info:
-
+                intent.setClass(getContext(), MonthChartActivity.class);
+                getContext().startActivity(intent);
                 break;
             case R.id.dialog_more_iv:
                 break;

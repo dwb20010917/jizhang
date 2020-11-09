@@ -194,6 +194,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (v == headerView) {
             //头布局被点击了
+            Intent intent = new Intent();
+            intent.setClass(this, MonthChartActivity.class);
+            startActivity(intent);
         }
     }
     /** 显示运算设置对话框*/
@@ -208,10 +211,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putFloat("bmoney",money);
                 editor.commit();
-
                 //计算剩余金额
                 float outcomeOneMonth = DBManager.getSumMoneyOneMonth(year, month, 0);
-
                 float syMoney = money-outcomeOneMonth;//预算剩余 = 预算-支出
                 topbudgetTv.setText("￥"+syMoney);
             }
